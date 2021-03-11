@@ -1,0 +1,3 @@
+[submodule "hangboard"]
+	path = hangboard
+	url = git@github.com:MWaug/hangboard.git
