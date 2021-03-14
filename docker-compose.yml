@@ -1,0 +1,28 @@
+version: '3.4'
+
+services:
+  hangboardjs:
+    image: hangboardjs
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    environment:
+      NODE_ENV: development
+    ports:
+      - 3000:3000
+      - 9229:9229
+    command: ["node", "--inspect=0.0.0.0:9229", "app/index.js"]
+
+  broker:
+    image: eclipse-mosquitto
+    build:
+      context: .
+    environment:
+      NODE_ENV: development
+    ports:
+      - 1883:1883
+      - 9001:9001
+    volumes:
+      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+      - ./broker/data:/mosquitto/data
+      - ./broker/log:/mosquitto/log
