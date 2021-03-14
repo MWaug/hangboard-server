@@ -1,3 +1,9 @@
+# Mosquitto broker temp files
 broker/data
 broker/log
+
+# Node
 node_modules
+
+# Filesystem artifact
+.DS_Store
