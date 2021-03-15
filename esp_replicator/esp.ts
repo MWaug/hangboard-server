@@ -1,0 +1,61 @@
+// Hangboard testing replica
+// This file replicates the MQTT transactions generated
+// by the hangboard. It is used for integration and end-to-end
+// testing of the webapp without the ESP8266 in the loop.
+
+import { xdescribe } from "@jest/globals";
+import express from "express";
+import mqtt from "mqtt";
+import { string } from "yargs";
+
+const port = 3001;
+const hostname = '0.0.0.0';
+// const mqttHostname = '127.0.0.1';
+const mqttHostname = '0.0.0.0';
+const app = express()
+
+// App
+app.get("/", (_req: any, res) => {
+  console.log(`Sending`);
+  res.send('Hello from ESP8266 replacement');
+  console.log(`Done`);
+})
+
+app.listen(port, hostname);
+console.log(`Server running at http://${hostname}:${port}/`);
+console.log(`Done with listening`)
+
+// MQTT
+const client  = mqtt.connect(`mqtt://${mqttHostname}`,{clientId:"index"});
+client.on("error",(error: string) => { console.log("Can't connect"+error); });
+client.on("connect",() => {	console.log("connected to MQTT port"); });
+
+// Publish an MQTT announcement every 1/10 seconds
+const topic: string = "testtopic";
+const qos: mqtt.QoS = 1;
+const options: mqtt.IClientPublishOptions = {retain:true, qos};
+
+// publish function
+function publish(t: string, msg: string, opt: mqtt.IClientPublishOptions){
+  console.log("publishing",msg);
+  if (client.connected === true){
+    client.publish(t, msg, opt);
+  }
+}
+
+let publishPeriodMS: number = 1000
+let publishPerCycle: number = 5
+
+// Hang weight as a function of time
+// t: time in milliseconds
+function getWeight(t: number): number {
+    const m: number = publishPeriodMS*publishPerCycle;
+    const x: number = m - Math.abs(t % (2*m) - m);
+    return x;
+}
+
+// publish every 0.1 secs
+const _timerID = setInterval(() => {
+    const message: string = {w: getWeight(Date.now()).toString() }.toString()
+    publish(topic,message,options);
+}, publishPeriodMS);

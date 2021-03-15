@@ -1,17 +1,17 @@
 version: '3.4'
 
 services:
-  hangboardjs:
-    image: hangboardjs
-    build:
-      context: .
-      dockerfile: ./Dockerfile
+  app:
+    build: ./app
     environment:
       NODE_ENV: development
+    volumes:
+      - ./app:/app
     ports:
       - 3000:3000
       - 9229:9229
-    command: ["node", "--inspect=0.0.0.0:9229", "app/index.js"]
+    # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "index.ts"]
+    command: "nodemon --watch '*.ts' --exec \"ts-node\" index.ts"
 
   broker:
     image: eclipse-mosquitto
@@ -26,3 +26,17 @@ services:
       - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
+  
+  esp_replicator:
+    build: ./esp_replicator
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./esp_replicator:/app
+    ports:
+      - 3001:3000
+      - 9228:9229
+    volumes:
+      - "./esp_replicator:/app"
+    # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "esp.ts"]
+    command: "nodemon --watch '*.ts' --exec \"ts-node\" esp.ts"
