@@ -11,7 +11,7 @@ import { string } from "yargs";
 const port = 3001;
 const hostname = '0.0.0.0';
 // const mqttHostname = '127.0.0.1';
-const mqttHostname = '0.0.0.0';
+const mqttHostname = 'host.docker.internal';
 const app = express()
 
 // App
