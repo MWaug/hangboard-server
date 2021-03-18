@@ -11,7 +11,7 @@ import { string } from "yargs";
 const port = 3001;
 const hostname = '0.0.0.0';
 // const mqttHostname = '127.0.0.1';
-const mqttHostname = 'host.docker.internal';
+const mqttHostname = 'broker'; // Name of the docker service in compose
 const app = express()
 
 // App

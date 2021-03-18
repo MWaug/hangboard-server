@@ -4,6 +4,14 @@ broker/log
 
 # Node
 node_modules
+app/package-lock.json
+esp_replicator/package-lock.json
+
+# Secrets
+app/app_secrets.ts
+
+# Typescript generated files
+app/lib
 
 # Filesystem artifact
 .DS_Store
