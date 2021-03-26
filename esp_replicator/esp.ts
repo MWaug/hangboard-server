@@ -28,7 +28,7 @@ console.log(`Done with listening`)
 // MQTT
 const client  = mqtt.connect(`mqtt://${mqttHostname}`,{clientId:"index"});
 client.on("error",(error: string) => { console.log("Can't connect"+error); });
-client.on("connect",() => {	console.log("connected to MQTT port"); });
+// client.on("connect",() => {	 });
 
 // Publish an MQTT announcement every 1/10 seconds
 const topic: string = "testtopic";
@@ -43,8 +43,8 @@ function publish(t: string, msg: string, opt: mqtt.IClientPublishOptions){
   }
 }
 
-let publishPeriodMS: number = 1000
-let publishPerCycle: number = 5
+let publishPeriodMS: number = 3000
+let publishPerCycle: number = 10 
 
 // Hang weight as a function of time
 // t: time in milliseconds
@@ -56,6 +56,6 @@ function getWeight(t: number): number {
 
 // publish every 0.1 secs
 const _timerID = setInterval(() => {
-    const message: string = {w: getWeight(Date.now()).toString() }.toString()
+    const message: string = JSON.stringify({t: [Date.now()],  v: [getWeight(Date.now())]})
     publish(topic,message,options);
 }, publishPeriodMS);
