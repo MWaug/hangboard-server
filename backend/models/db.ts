@@ -38,6 +38,7 @@ function HangEventFromPacket(packet: mqtt.IPublishPacket): HangEventType {
   var stringBuf = packet.payload.toString('utf-8');
   var json = JSON.parse(stringBuf);
   let he: HangEventType = {
+    recvTime: new Date(),
     maxWeight: json["max_weight"],
     aveWeight: json["ave_weight"],
     startTime: json["start_hang_ms"],
@@ -45,7 +46,7 @@ function HangEventFromPacket(packet: mqtt.IPublishPacket): HangEventType {
     t: [],
     weight: [],
     user: "testUser",
-    device: "",
+    device: json["device_id"],
     meta: {}
   }
   return he;
@@ -64,5 +65,6 @@ export function saveMQTTPacket (packet: mqtt.IPublishPacket) {
   } catch (e) {
     console.log( "Could not save mqtt packet" );
     console.log( packet );
+    console.log(e)
   }
 }

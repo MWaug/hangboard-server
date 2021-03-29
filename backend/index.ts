@@ -29,7 +29,7 @@ client.on("error",(error: string) => { console.log("Can't connect"+error); });
 client.on("connect",() => {	console.log("connected to MQTT port"); });
 
 client.subscribe("testtopic", {qos:1});
-client.subscribe("hang_event", {qos:1});
+client.subscribe("finish_hang_event", {qos:1});
 client.on('message', (topic: string, message: string, packet: any) => {
   console.log("message is " + packet.payload.toString('utf-8'));
   console.log("topic is " + topic);
