@@ -1,4 +1,5 @@
-import { MongTSType, saveTS, getTS, makeTimeSeriesRecords, recordsFromMQTTPacket, saveMQTTPacket } from "./db";
+import { recordsFromMQTTPacket, saveMQTTPacket, db } from "./db";
+import { MongTSType, saveTS, getTS, makeTimeSeriesRecords } from "./time_series.model"
 import mqttPacket from "mqtt-packet";
 
 test('database connects and saves', async () => {
@@ -37,9 +38,24 @@ test('database connects and saves', async () => {
      }
   }
   saveMQTTPacket(packet);
+  const ts_mqtt: MongTSType | null = await getTS(2);
+  expect(ts_mqtt).toBeTruthy();
+  if(ts_mqtt) {
+    expect(Array.from(ts_mqtt.t)).toStrictEqual([2]);
+    expect(Array.from(ts_mqtt.v)).toStrictEqual([20]);
+  }
+
+  const ts_failed: MongTSType | null = await getTS(-100);
+  expect(ts_failed).not.toBeTruthy();
+
+  db.close();
 });
 
-test('create time series records', async () => {
+test('invalid series record throws exception', () => {
+  expect(() => makeTimeSeriesRecords([1, 2, 4], [1], 1)).toThrow('t[3] and v[1] are different lengths')
+}) 
+
+test('create time series records', () => {
   expect(makeTimeSeriesRecords([1,1.5,3,4,5], [10,15,30,40,50], 3)).toStrictEqual(
     [{startTime: 1, meta: {}, t:[1,1.5,3], v:[10,15,30]}, {startTime: 4, meta: {}, t:[4,5], v:[40, 50]}]
   )
@@ -85,4 +101,14 @@ test('records from mqtt packet', async() => {
       {startTime: 1.5, t:[1.5], v:[15], meta: {}},
       {startTime: 3, t:[3], v:[30], meta: {}} ]
   )
+  const invalidPacket: mqttPacket.IPublishPacket = {
+    cmd: 'publish',
+    qos: 2,
+    retain: false,
+    dup: false,
+    topic: 'test',
+    messageId: 101,
+    payload: Buffer.from(JSON.stringify({apple: "isgood", nonTSfield: "blah"}))
+  }
+  expect(recordsFromMQTTPacket(invalidPacket)).toStrictEqual([])
 })

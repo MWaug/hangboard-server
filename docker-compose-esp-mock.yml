@@ -28,3 +28,28 @@ services:
       - ./broker/log:/mosquitto/log
       - ./broker/passwd_file:/etc/mosquitto/passwd
   
+  esp_replicator:
+    build: ./esp_replicator
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./esp_replicator:/app
+    ports:
+      - 3001:3000
+      - 9228:9229
+    volumes:
+      - "./esp_replicator:/app"
+    # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "esp.ts"]
+    command: "nodemon --watch '*.ts' --exec \"ts-node\" esp.ts"
+  
+  # db:
+  #   image: mongo
+  #   ports:
+  #     - 27017:27017
+  #   volumes:
+  #     - mongodb:/data/db
+  #     - mongodb_config:/data/configdb
+
+# volumes:
+#   mongodb:
+#   mongodb_config:

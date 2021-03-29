@@ -4,14 +4,20 @@ broker/log
 
 # Node
 node_modules
-app/package-lock.json
+backend/package-lock.json
 esp_replicator/package-lock.json
 
+# Jest
+backend/coverage
+
 # Secrets
-app/app_secrets.ts
+system_secrets.ts
+backend/app_secrets.ts
+broker/passwd_file
+esp_replicator/esp_secrets.ts
 
 # Typescript generated files
-app/lib
+backend/lib
 
 # Filesystem artifact
 .DS_Store

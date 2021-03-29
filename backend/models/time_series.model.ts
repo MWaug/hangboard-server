@@ -1,4 +1,3 @@
-import { exception } from "console";
 import mongoose, { Schema } from "mongoose"
 
 export type TSType = {
@@ -19,9 +18,13 @@ let TimeSeriesSchema: Schema = new Schema({
   });
 
 // Compile model from schema
-var TimeSeries = mongoose.model<MongTSType>('TimeSeries', TimeSeriesSchema );
+var TimeSeries = mongoose.model<MongTSType>('time_series', TimeSeriesSchema );
 // var HangEvents = mongoose.model('HangEvents', HangEventSchema );
 
+/**
+ * Save time series data to the database
+ * @param ts Time Series data to be saved
+ */
 export function saveTS(ts: TSType) {
   // Save the new model instance, passing a callback
   const TimeSeriesInstance: mongoose.Document = new TimeSeries(ts);
@@ -31,13 +34,8 @@ export function saveTS(ts: TSType) {
   });
 }
 
-export async function getTS(startTime: number): Promise<MongTSType | null> { 
-  try {
-    return await TimeSeries.findOne({ 'startTime': startTime });
-  } catch(err) {
-    console.log(err);
-    return null;
-  }
+export async function getTS(startTime: number) {
+    return await TimeSeries.findOne({startTime: startTime});
 }
 
 /**
@@ -64,10 +62,10 @@ export async function getTS(startTime: number): Promise<MongTSType | null> {
  export function makeTimeSeriesRecords(t: number[], v: number[], bucketSize: number = 1, meta: {} = {}): TSType[] {
     if (t.length != v.length) {
       const msg: string = `t[${t.length}] and v[${v.length}] are different lengths`;
-      console.log(`t[${t.length}] and v[${v.length}] are different lengths`);
-      throw exception(msg);
+      console.log(msg);
+      throw new Error(msg);
     }
-    if (bucketSize < 1) { throw exception(`bucketSize must be greater than 0`) }
+    if (bucketSize < 1) { throw new Error(`bucketSize must be greater than 0`) }
   
     const tChunks: number[][] = chunkArray(t, bucketSize);
     const vChunks: number[][] = chunkArray(v, bucketSize);
@@ -77,4 +75,4 @@ export async function getTS(startTime: number): Promise<MongTSType | null> {
       ts.push(newRecord)
     });
     return ts
-  }
+ }

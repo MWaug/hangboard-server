@@ -3,14 +3,12 @@
 // by the hangboard. It is used for integration and end-to-end
 // testing of the webapp without the ESP8266 in the loop.
 
-import { xdescribe } from "@jest/globals";
 import express from "express";
 import mqtt from "mqtt";
-import { string } from "yargs";
+import { MOSQUITTO_PASSWD, MOSQUITTO_USER } from "./esp_secrets"
 
 const port = 3001;
 const hostname = '0.0.0.0';
-// const mqttHostname = '127.0.0.1';
 const mqttHostname = 'broker'; // Name of the docker service in compose
 const app = express()
 
@@ -26,7 +24,9 @@ console.log(`Server running at http://${hostname}:${port}/`);
 console.log(`Done with listening`)
 
 // MQTT
-const client  = mqtt.connect(`mqtt://${mqttHostname}`,{clientId:"index"});
+const client  = mqtt.connect(
+  `mqtt://${mqttHostname}`,
+  {clientId:"index", username: MOSQUITTO_USER, password: MOSQUITTO_PASSWD});
 client.on("error",(error: string) => { console.log("Can't connect"+error); });
 // client.on("connect",() => {	 });
 
