@@ -12,8 +12,10 @@ backend/coverage
 
 # Secrets
 system_secrets.ts
+common/app_secrets.ts
 frontend/app_secrets.ts
 backend/app_secrets.ts
+hangon/app_secrets.ts
 broker/passwd_file
 esp_replicator/esp_secrets.ts
 
