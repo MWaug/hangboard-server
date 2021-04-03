@@ -2,8 +2,8 @@ import mongoose, { Schema } from "mongoose"
 
 export type HangEventType = {
     recvTime: Date,
-    startTime: Date,
-    endTime: Date,
+    startTime: number,
+    endTime: number,
     maxWeight: number,
     aveWeight: number,
     user: String,
@@ -18,8 +18,8 @@ export interface MongTSType extends HangEventType, mongoose.Document {};
 // Define schemas
 let HangEventSchema: Schema = new Schema({
   recvTime: {type: Date, required: true},
-  startTime: {type: Date, required: true},
-  endTime: {type: Date, required: true},
+  startTime: {type: Number, required: true},
+  endTime: {type: Number, required: true},
   maxWeight: Number, // Lbs
   aveWeight: Number, // Lbs
   user: String,

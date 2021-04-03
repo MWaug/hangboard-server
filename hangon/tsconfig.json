@@ -8,5 +8,10 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "strict": true
-  }
+  },
+  "include": [
+    "../common/*",
+    "src/libraries/app_secrets.ts",
+    "src/libraries/utils.ts"
+  ]
 }

@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 services:
   backend:
@@ -7,11 +7,12 @@ services:
       NODE_ENV: development
     volumes:
       - ./backend:/app
+      - ./hangon/src/shared:/hangon/src/shared
     ports:
       - 3000:3000
       - 9229:9229
     # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "index.ts"]
-    command: "nodemon --watch '*.ts' --exec \"ts-node\" index.ts"
+    command: 'nodemon --watch ''*.ts'' --exec "ts-node" index.ts'
 
   broker:
     image: eclipse-mosquitto
@@ -27,4 +28,3 @@ services:
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
       - ./broker/passwd_file:/etc/mosquitto/passwd
-  

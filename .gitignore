@@ -5,6 +5,7 @@ broker/log
 # Node
 node_modules
 backend/package-lock.json
+hangon/package-lock.json
 esp_replicator/package-lock.json
 
 # Jest
