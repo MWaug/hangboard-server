@@ -1,12 +1,17 @@
 import React, { useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { View, StyleSheet, Dimensions } from "react-native";
+import { LineChart } from "react-native-chart-kit";
 
+import * as color from "../app/colors";
 import {
   FinishHangEventMqttType,
   StartHangEventMqttType,
   WeightEventMqttType,
 } from "../shared/utils";
-import { hangonMqttConnect, hangonSetMqttMessageHandler } from "../libraries/hangonMqtt";
+import {
+  hangonMqttConnect,
+  hangonSetMqttMessageHandler,
+} from "../libraries/hangonMqtt";
 import {
   hangStarted,
   hangFinished,
@@ -14,57 +19,111 @@ import {
 } from "../shared/store/hangboardSlice";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { RootState } from "../app/store";
+import AppText from "./AppText";
+import BigText from "./BigText";
 
 hangonMqttConnect();
 
 export default function HangView() {
   const dispatch = useAppDispatch();
 
-  hangonSetMqttMessageHandler((msg: FinishHangEventMqttType) => {
-    // console.log(msg);
-    dispatch(hangFinished(msg));
-  },
-  (msg: StartHangEventMqttType) => {
-    console.log(msg);
-    dispatch(hangStarted(msg));
-  },
-  (msg: WeightEventMqttType) => {
-    dispatch(weightReceived(msg));
-  })
+  hangonSetMqttMessageHandler(
+    (msg: FinishHangEventMqttType) => {
+      // console.log(msg);
+      dispatch(hangFinished(msg));
+    },
+    (msg: StartHangEventMqttType) => {
+      console.log(msg);
+      dispatch(hangStarted(msg));
+    },
+    (msg: WeightEventMqttType) => {
+      dispatch(weightReceived(msg));
+    }
+  );
 
   const duration = useAppSelector(
     (state: RootState) => state.entities.hangboard.duration
   );
 
+  const weight = useAppSelector(
+    (state: RootState) => state.entities.hangboard.weight
+  );
+
+  const inHang = useAppSelector(
+    (state: RootState) => state.entities.hangboard.inHang
+  );
+
+  const maxWeight = useAppSelector(
+    (state: RootState) => state.entities.hangboard.maxWeight
+  );
+
+  const recordedWeight = useAppSelector(
+    (state: RootState) => state.entities.hangboard.plotData
+  );
+
+  const chartConfig = {
+    // backgroundGradientFrom: color.primary,
+    backgroundGradientFromOpacity: 0,
+    // backgroundGradientTo: color.secondary,
+    backgroundGradientToOpacity: 0,
+    color: (opacity = 1) => `rgba(115, 89, 73, ${opacity})`,
+    strokeWidth: 2, // optional, default 3
+    barPercentage: 0.5,
+    useShadowColorFromDataset: false, // optional
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={{...styles.bar, height: MAX_BAR_HEIGHT * (duration/MAX_DURATION)}}></View>
-      <View>
-        <Text >Duration: {duration/1000}</Text>
+    <View
+      style={{
+        ...styles.container,
+        backgroundColor: inHang === true ? color.accent : color.lighter,
+      }}
+    >
+      <View
+        style={{
+          flex: -1,
+          flexDirection: "row",
+          justifyContent: "space-evenly",
+          alignItems: "flex-end",
+        }}
+      >
+        <LineChart
+          data={{
+            labels: (recordedWeight.length === 0) ? [0] : Array(recordedWeight.length).fill(" "),
+            datasets: [
+              {
+                data: (recordedWeight.length === 0) ? [0] : recordedWeight,
+                color: (opacity = 1) => `rgba(134, 65, 244, ${opacity})`,
+              },
+            ],
+          }}
+          width={Dimensions.get("window").width}
+          height={220}
+          chartConfig={chartConfig}
+        ></LineChart>
+      </View>
+      <View style={styles.statsBar}>
+        <BigText>{(duration / 1000).toFixed(1)}s</BigText>
+        <BigText>{maxWeight + "lbs"}</BigText>
       </View>
       <View style={styles.navBar}>
-        <View><Text>Back</Text></View>
-        <View><Text>Forward</Text></View>
+        <View>
+          <AppText>Back</AppText>
+        </View>
+        <View>
+          <AppText>Forward</AppText>
+        </View>
       </View>
     </View>
   );
 }
 
-const MAX_BAR_HEIGHT = 500;
-const MAX_DURATION = 20000;
-
-const computeBarHeight = (duration: number, max: number) => {}
-
 const styles = StyleSheet.create({
-  bar: {
-    width: 100,
-    backgroundColor: "dodgerblue"
-  },
   navBar: {
     height: 50,
-    backgroundColor: "yellowgreen",
+    backgroundColor: color.secondary,
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "space-evenly",
     alignItems: "center",
   },
   container: {
@@ -72,4 +131,10 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
     alignContent: "center",
   },
-})
+  statsBar: {
+    backgroundColor: color.lighter,
+    alignItems: "center",
+    justifyContent: "space-evenly",
+    flexDirection: "row",
+  },
+});
