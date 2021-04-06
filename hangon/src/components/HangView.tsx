@@ -76,7 +76,6 @@ export default function HangView() {
     <View
       style={{
         ...styles.container,
-        backgroundColor: inHang === true ? color.accent : color.lighter,
       }}
     >
       <View
@@ -121,7 +120,7 @@ export default function HangView() {
 const styles = StyleSheet.create({
   navBar: {
     height: 50,
-    backgroundColor: color.secondary,
+    backgroundColor: color.darker,
     flexDirection: "row",
     justifyContent: "space-evenly",
     alignItems: "center",
@@ -130,9 +129,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "flex-end",
     alignContent: "center",
+    backgroundColor: color.lighter,
   },
   statsBar: {
-    backgroundColor: color.lighter,
+    backgroundColor: color.primary,
     alignItems: "center",
     justifyContent: "space-evenly",
     flexDirection: "row",

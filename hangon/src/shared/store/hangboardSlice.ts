@@ -27,7 +27,7 @@ const initialState: HangboardState = {
   hangEnd: 0,
   hangData: [0],
   plotData: [0],
-  plotDownSample: 5,
+  plotDownSample: 10,
 };
 
 const slice = createSlice({
@@ -44,6 +44,7 @@ const slice = createSlice({
     hangFinished: (state, action: PayloadAction<FinishHangEventMqttType>) => {
       state.inHang = false;
       state.hangEnd = action.payload.endTime;
+      state.plotData = state.hangData;
       if (state.hangStart !== 0) {
         state.duration = action.payload.endTime - action.payload.startTime;
       }
