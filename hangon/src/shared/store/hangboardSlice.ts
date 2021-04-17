@@ -14,7 +14,7 @@ interface HangboardState {
   hangStart: number;
   hangEnd: number;
   hangData: number[];
-  plotData: number[];
+  hangTime: number[];
   plotDownSample: number;
 }
 
@@ -25,8 +25,8 @@ const initialState: HangboardState = {
   duration: 0,
   hangStart: 0,
   hangEnd: 0,
-  hangData: [0],
-  plotData: [0],
+  hangData: [],
+  hangTime: [],
   plotDownSample: 10,
 };
 
@@ -37,14 +37,13 @@ const slice = createSlice({
     hangStarted: (state, action: PayloadAction<StartHangEventMqttType>) => {
       state.inHang = true;
       state.hangStart = action.payload.startTime;
-      state.hangData = [state.weight];
+      state.hangData = [];
+      state.hangTime = [];
       state.maxWeight = 0;
-      state.plotData = [state.weight];
     },
     hangFinished: (state, action: PayloadAction<FinishHangEventMqttType>) => {
       state.inHang = false;
       state.hangEnd = action.payload.endTime;
-      state.plotData = state.hangData;
       if (state.hangStart !== 0) {
         state.duration = action.payload.endTime - action.payload.startTime;
       }
@@ -54,9 +53,7 @@ const slice = createSlice({
       if (state.inHang) {
         state.duration = action.payload.time - state.hangStart;
         state.hangData = [...state.hangData, action.payload.weight];
-        if (state.hangData.length % state.plotDownSample === 0) {
-          state.plotData = [...state.plotData, action.payload.weight];
-        }
+        state.hangTime = [...state.hangTime, action.payload.time];
         state.maxWeight =
           action.payload.weight > state.maxWeight
             ? action.payload.weight

@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Provider } from 'react-redux';
 
-import HangView from './src/components/HangView';
+import TopScreen from './src/screens/TopScreen';
 import {store} from './src/app/store'
 
 export default function App() {
   return (
     <Provider store={store}>
-      <HangView />
+      <TopScreen></TopScreen>
     </Provider>
   );
 }
