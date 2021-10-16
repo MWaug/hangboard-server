@@ -1,4 +1,4 @@
-version: '3.4'
+version: "3.4"
 
 services:
   backend:
@@ -11,7 +11,7 @@ services:
       - 3000:3000
       - 9229:9229
     # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "index.ts"]
-    command: "nodemon --watch '*.ts' --exec \"ts-node\" index.ts"
+    command: 'nodemon --watch ''*.ts'' --exec "ts-node" index.ts'
 
   broker:
     image: eclipse-mosquitto
@@ -20,11 +20,10 @@ services:
     environment:
       NODE_ENV: development
     ports:
-      - 192.168.0.21:1883:1883
-      - 192.168.0.21:9001:9001
+      - 0.0.0.0:1883:1883
+      - 0.0.0.0:9001:9001
     volumes:
       - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./broker/data:/mosquitto/data
       - ./broker/log:/mosquitto/log
       - ./broker/passwd_file:/etc/mosquitto/passwd
-  

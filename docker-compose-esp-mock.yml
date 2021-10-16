@@ -20,8 +20,8 @@ services:
     environment:
       NODE_ENV: development
     ports:
-      - 192.168.0.21:1883:1883
-      - 9001:9001
+      - 0.0.0.0:1883:1883
+      - 0.0.0.0:9001:9001
     volumes:
       - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
       - ./broker/data:/mosquitto/data
