@@ -22,14 +22,14 @@ console.log(`Moving onto MQTT`)
 
 // MQTT
 console.log("Connecting to MQTT server");
-const client  = mqtt.connect(
+const client = mqtt.connect(
   `mqtt://${mqttHostname}`,
-  {clientId:"index", username: MOSQUITTO_USER, password: MOSQUITTO_PASSWD});
-client.on("error",(error: string) => { console.log("Can't connect"+error); });
-client.on("connect",() => {	console.log("connected to MQTT port"); });
+  { clientId: "index", username: MOSQUITTO_USER, password: MOSQUITTO_PASSWD });
+client.on("error", (error: string) => { console.log("Can't connect" + error); });
+client.on("connect", () => { console.log("connected to MQTT port"); });
 
-client.subscribe("testtopic", {qos:1});
-client.subscribe("finish_hang_event", {qos:1});
+client.subscribe("testtopic", { qos: 1 });
+client.subscribe("finish_hang_event", { qos: 1 });
 client.on('message', (topic: string, message: string, packet: any) => {
   console.log("message is " + packet.payload.toString('utf-8'));
   console.log("topic is " + topic);
