@@ -1,8 +1,8 @@
 // import { MongoClient } from "mongodb";
-import { DB_URI } from "../app_secrets"
+import { DB_URI } from "../app_secrets";
 import mqtt from "mqtt";
-import mongoose from "mongoose"
-import { TSType, makeTimeSeriesRecords, saveTS } from "./time_series.model"
+import mongoose from "mongoose";
+import { TSType, makeTimeSeriesRecords, saveTS } from "./time_series.model";
 import { HangEventType, saveHangEvent } from "./hang_event.model";
 
 //Set up default mongoose connection
@@ -13,11 +13,14 @@ mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 export var db = mongoose.connection;
 
 //Bind connection to error event (to get notification of connection errors)
-db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.on("error", console.error.bind(console, "MongoDB connection error:"));
 
-export function recordsFromMQTTPacket(packet: mqtt.IPublishPacket, bucketSize: number = 1, meta: {} = {}):
-  TSType[] {
-  var stringBuf = packet.payload.toString('utf-8');
+export function recordsFromMQTTPacket(
+  packet: mqtt.IPublishPacket,
+  bucketSize: number = 1,
+  meta: {} = {}
+): TSType[] {
+  var stringBuf = packet.payload.toString("utf-8");
   try {
     var json = JSON.parse(stringBuf);
     var t = json["t"];
@@ -25,16 +28,16 @@ export function recordsFromMQTTPacket(packet: mqtt.IPublishPacket, bucketSize: n
     if (t == undefined || v == undefined) {
       throw new Error(`t and v not found in MQTT message: ${json}`);
     }
-    return makeTimeSeriesRecords(t, v, bucketSize = bucketSize, meta = meta);
+    return makeTimeSeriesRecords(t, v, (bucketSize = bucketSize), (meta = meta));
   } catch (e) {
-    console.log("Could not save mqtt packet")
+    console.log("Could not save mqtt packet");
     console.log(packet);
-    return []
+    return [];
   }
 }
 
 function HangEventFromPacket(packet: mqtt.IPublishPacket): HangEventType {
-  var stringBuf = packet.payload.toString('utf-8');
+  var stringBuf = packet.payload.toString("utf-8");
   var json = JSON.parse(stringBuf);
   let he: HangEventType = {
     recvTime: new Date(),
@@ -46,8 +49,8 @@ function HangEventFromPacket(packet: mqtt.IPublishPacket): HangEventType {
     weight: [],
     user: "testUser",
     device: json["device_id"],
-    meta: {}
-  }
+    meta: {},
+  };
   return he;
 }
 
@@ -64,6 +67,6 @@ export function saveMQTTPacket(packet: mqtt.IPublishPacket) {
   } catch (e) {
     console.log("Could not save mqtt packet");
     console.log(packet);
-    console.log(e)
+    console.log(e);
   }
 }
