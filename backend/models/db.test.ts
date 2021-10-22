@@ -1,26 +1,26 @@
-import { recordsFromMQTTPacket, saveMQTTPacket, db } from "./db";
-import { MongTSType, saveTS, getTS, makeTimeSeriesRecords } from "./time_series.model";
+import { recordsFromMQTTPacket, saveMQTTPacket } from "./db";
+import { makeTimeSeriesRecords } from "./time_series.model";
 import mqttPacket from "mqtt-packet";
 
-test("database connects and saves", async () => {
-  const exampleTS = { startTime: 1, t: [1], v: [10], meta: {} };
-  saveTS(exampleTS);
-  const ts: MongTSType | null = await getTS(1);
-  expect(ts).toBeTruthy();
-
-  if (ts) {
-    expect(Array.from(ts.t)).toStrictEqual([1]);
-    expect(Array.from(ts.v)).toStrictEqual([10]);
-  }
-
-  const exampleTS2 = { startTime: 2, t: [2], v: [20], meta: {} };
-  const payloadStr: string = JSON.stringify(exampleTS2);
+test("Save finish hang event", async () => {
+  const exampleFinishPayload = {
+    max_weight: 2,
+    ave_weight: 190,
+    device_id: "48:3F:DA:7D:C5:52",
+    start_hang_ms: 1000,
+    end_hang_ms: 2000,
+    cur_time_ms: 2010,
+    times: [1, 2],
+    weight: [170, 190],
+    meta: {},
+  };
+  const payloadStr: string = JSON.stringify(exampleFinishPayload);
   const packet: mqttPacket.IPublishPacket = {
     cmd: "publish",
     messageId: 42,
     qos: 2,
     dup: false,
-    topic: "test",
+    topic: "finish_hang_event",
     payload: Buffer.from(payloadStr),
     retain: false,
     properties: {
@@ -37,18 +37,7 @@ test("database connects and saves", async () => {
       contentType: "test",
     },
   };
-  saveMQTTPacket(packet);
-  const ts_mqtt: MongTSType | null = await getTS(2);
-  expect(ts_mqtt).toBeTruthy();
-  if (ts_mqtt) {
-    expect(Array.from(ts_mqtt.t)).toStrictEqual([2]);
-    expect(Array.from(ts_mqtt.v)).toStrictEqual([20]);
-  }
-
-  const ts_failed: MongTSType | null = await getTS(-100);
-  expect(ts_failed).not.toBeTruthy();
-
-  db.close();
+  await saveMQTTPacket(packet);
 });
 
 test("invalid series record throws exception", () => {

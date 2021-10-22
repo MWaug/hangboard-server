@@ -1,34 +1,9 @@
-import mongoose, { Schema } from "mongoose";
-
 export type TSType = {
   startTime: number;
   t: number[];
   v: number[];
   meta: {};
 };
-
-export interface MongTSType extends TSType, mongoose.Document {}
-
-// Compile model from schema
-var TimeSeries = mongoose.model<MongTSType>("time_series", TimeSeriesSchema);
-// var HangEvents = mongoose.model('HangEvents', HangEventSchema );
-
-/**
- * Save time series data to the database
- * @param ts Time Series data to be saved
- */
-export function saveTS(ts: TSType) {
-  // Save the new model instance, passing a callback
-  const TimeSeriesInstance: mongoose.Document = new TimeSeries(ts);
-  TimeSeriesInstance.save(function (err) {
-    if (err) console.log(err);
-    // saved!
-  });
-}
-
-export async function getTS(startTime: number) {
-  return await TimeSeries.findOne({ startTime: startTime });
-}
 
 /**
  * Chunk an array into parts no larger than chunkSize.
@@ -70,12 +45,7 @@ export function makeTimeSeriesRecords(
   const vChunks: number[][] = chunkArray(v, bucketSize);
   var ts: TSType[] = [];
   tChunks.forEach((tChunk, i) => {
-    const newRecord: TSType = {
-      startTime: tChunk[0],
-      t: tChunk,
-      v: vChunks[i],
-      meta: meta,
-    };
+    const newRecord: TSType = { startTime: tChunk[0], t: tChunk, v: vChunks[i], meta: meta };
     ts.push(newRecord);
   });
   return ts;
