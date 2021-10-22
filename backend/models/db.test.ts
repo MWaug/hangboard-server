@@ -1,6 +1,80 @@
-import { recordsFromMQTTPacket, saveMQTTPacket } from "./db";
+import { recordsFromMQTTPacket, saveHangEvent, saveMQTTPacket } from "./db";
 import { makeTimeSeriesRecords } from "./time_series.model";
 import mqttPacket from "mqtt-packet";
+import { HangEventType } from "./hang_event.model";
+
+const weightFunction = (
+  startTimeMs: number,
+  endTimeMs: number,
+  aveWeight: number,
+  sampleTime: number
+): number => {
+  const duration = endTimeMs - startTimeMs;
+  const riseEnd = startTimeMs + duration * 0.1;
+  const fallStart = startTimeMs + duration * 0.9;
+
+  // Rising edge
+  if (sampleTime < riseEnd) {
+    const slope = (aveWeight - 0) / (riseEnd - startTimeMs);
+    const offset = 0;
+    return slope * (sampleTime - startTimeMs) + offset;
+  }
+
+  // Constant force
+  if (sampleTime > riseEnd && sampleTime < fallStart) {
+    return aveWeight + Math.random() * aveWeight * 0.1;
+  }
+
+  // Falling edge
+  const slope = (0 - aveWeight) / (endTimeMs - fallStart);
+  const offset = aveWeight;
+  return slope * (sampleTime - fallStart) + offset;
+};
+
+const generateHangEvent = (
+  startTimeMs: number,
+  maxHangMs: number,
+  samplesPerSecond: number,
+  aveWeight: number
+): HangEventType => {
+  const endTimeMs = startTimeMs + Math.random() * maxHangMs;
+  const duration = endTimeMs - startTimeMs;
+  const nSamples = Math.floor(duration * (samplesPerSecond / 1000.0));
+  var weight: number[] = [];
+  var times: number[] = [];
+
+  for (var i = 0; i < nSamples; i++) {
+    times.push(startTimeMs + i * (1000 / samplesPerSecond));
+  }
+  for (var i = 0; i < nSamples; i++) {
+    weight.push(weightFunction(startTimeMs, endTimeMs, aveWeight, times[i]));
+  }
+
+  const average = (array: number[]) => array.reduce((a: number, b: number) => a + b) / array.length;
+  const max = (array: number[]) => array.reduce((a: number, b: number) => (a > b ? a : b));
+
+  return {
+    maxWeight: max(weight),
+    aveWeight: average(weight),
+    device: "48:3F:DA:7D:C5:53",
+    recvTime: new Date(),
+    startTimeMs: startTimeMs,
+    endTimeMs: endTimeMs,
+    curTimeMs: endTimeMs + 10,
+    user: "exampleUser",
+    weight: weight,
+    times: times,
+    meta: { exampleData: true },
+  };
+};
+
+test("Generate example User data", async () => {
+  var startTimeMs = 1000;
+  for (var i = 0; i < 15; i++) {
+    const exampleHang = generateHangEvent(startTimeMs + 20000 * i, 10000, 10, 180);
+    saveHangEvent(exampleHang);
+  }
+});
 
 test("Save finish hang event", async () => {
   const exampleFinishPayload = {
