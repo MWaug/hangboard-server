@@ -10,7 +10,7 @@ test("Save finish hang event", async () => {
     start_hang_ms: 1000,
     end_hang_ms: 2000,
     cur_time_ms: 2010,
-    times: [1, 2],
+    times: [1000, 1100],
     weight: [170, 190],
     meta: {},
   };

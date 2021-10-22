@@ -1,7 +1,8 @@
 export type HangEventType = {
   recvTime: Date;
-  startTime: Date;
-  endTime: Date;
+  startTimeMs: number;
+  curTimeMs: number;
+  endTimeMs: number;
   maxWeight: number;
   aveWeight: number;
   user: String;

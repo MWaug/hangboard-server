@@ -24,10 +24,10 @@ export const firestoreFromHangEvent = (he: HangEventType): DocumentData => {
   const newDocRef: DocumentData = {
     aveWeight: he.aveWeight,
     device: he.device,
-    endTime: he.endTime,
+    endTime: he.endTimeMs,
     maxWeight: he.maxWeight,
     recvTime: he.recvTime,
-    startTime: he.startTime,
+    startTime: he.startTimeMs,
     user: he.user,
     times: he.times,
     weight: he.weight,
@@ -59,17 +59,18 @@ export function recordsFromMQTTPacket(
 function HangEventFromPacket(packet: mqtt.IPublishPacket): HangEventType {
   var stringBuf = packet.payload.toString("utf-8");
   var json = JSON.parse(stringBuf);
-  const hasWeight = Object.values(json).includes("weight");
-  const times: number[] = hasWeight ? json["weight"] : [];
+  const hasWeight = Object.keys(json).includes("weight");
+  const times: number[] = hasWeight ? json["times"] : [];
   const weight: number[] = hasWeight ? json["weight"] : [];
   let he: HangEventType = {
     recvTime: new Date(),
     maxWeight: json["max_weight"],
     aveWeight: json["ave_weight"],
-    startTime: json["start_hang_ms"],
-    endTime: json["end_hang_ms"],
+    startTimeMs: json["start_hang_ms"],
+    endTimeMs: json["end_hang_ms"],
     times: times,
     weight: weight,
+    curTimeMs: json["cur_time_ms"],
     // TODO: Lookup current user connected to the device
     user: "testUser",
     device: json["device_id"],
