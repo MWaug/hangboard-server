@@ -47,18 +47,47 @@ function publish(t: string, msg: string, opt: mqtt.IClientPublishOptions) {
   }
 }
 
-let publishPeriodMS: number = 1000;
-let publishPerCycle: number = 10;
+let publishPeriodMS: number = 300;
+
+const weightFunction = (
+  startTimeMs: number,
+  endTimeMs: number,
+  aveWeight: number,
+  sampleTime: number
+): number => {
+  const duration = endTimeMs - startTimeMs;
+  const riseEnd = startTimeMs + duration * 0.1;
+  const fallStart = startTimeMs + duration * 0.9;
+
+  // Rising edge
+  if (sampleTime < riseEnd) {
+    const slope = (aveWeight - 0) / (riseEnd - startTimeMs);
+    const offset = 0;
+    return slope * (sampleTime - startTimeMs) + offset;
+  }
+
+  // Constant force
+  if (sampleTime > riseEnd && sampleTime < fallStart) {
+    return aveWeight + Math.random() * aveWeight * 0.1;
+  }
+
+  // Falling edge
+  const slope = (0 - aveWeight) / (endTimeMs - fallStart);
+  const offset = aveWeight;
+  return slope * (sampleTime - fallStart) + offset;
+};
 
 // Hang weight as a function of time
 // t: time in milliseconds
 function getWeight(t: number): number {
-  const m: number = publishPeriodMS * publishPerCycle;
-  const x: number = m - Math.abs((t % (2 * m)) - m);
-  return x;
+  const aveWeight: number = 160;
+  const startTimeMs: number = 0;
+  const endTimeMs: number = 10000;
+  const curTime: number = t % endTimeMs;
+  return weightFunction(startTimeMs, endTimeMs, aveWeight, curTime);
 }
 
-// publish every 0.1 secs
+// publish every publishPeriodMS secs
 const _timerID = setInterval(() => {
   const message: string = JSON.stringify({
     t: [Date.now()],
