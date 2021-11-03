@@ -41,15 +41,4 @@ services:
       - "./esp_replicator:/app"
     # command: ["nodemon", "--watch '*.ts'", '--exec "ts-node"', "--inspect=0.0.0.0:9229", "esp.ts"]
     command: "nodemon --watch '*.ts' --exec \"ts-node\" esp.ts"
-  
-  # db:
-  #   image: mongo
-  #   ports:
-  #     - 27017:27017
-  #   volumes:
-  #     - mongodb:/data/db
-  #     - mongodb_config:/data/configdb
-
-# volumes:
-#   mongodb:
-#   mongodb_config:
+:

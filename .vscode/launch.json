@@ -1,20 +1,39 @@
 {
-    "configurations": [
-        {
-            "name": "Debug App Jest Tests",
-            "type": "node",
-            "request": "launch",
-            "runtimeArgs": ["--inspect-brk", "${workspaceRoot}/app/node_modules/.bin/jest", "--runInBand", "--detectOpenHandles"],
-            "console": "integratedTerminal",
-            "internalConsoleOptions": "neverOpen",
-            "cwd":"${workspaceFolder}/app"
-        },
-        {
-            "name": "Docker Node.js Launch",
-            "type": "docker",
-            "request": "launch",
-            "preLaunchTask": "docker-run: debug",
-            "platform": "node"
-        }
-    ]
+  "configurations": [
+    {
+      "name": "Debug Node Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/backend/node_modules/.bin/jest",
+        "--runInBand",
+        "--detectOpenHandles"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/backend"
+    },
+    {
+      "name": "Debug App Jest Tests",
+      "type": "node",
+      "request": "launch",
+      "runtimeArgs": [
+        "--inspect-brk",
+        "${workspaceRoot}/app/node_modules/.bin/jest",
+        "--runInBand",
+        "--detectOpenHandles"
+      ],
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen",
+      "cwd": "${workspaceFolder}/app"
+    },
+    {
+      "name": "Docker Node.js Launch",
+      "type": "docker",
+      "request": "launch",
+      "preLaunchTask": "docker-run: debug",
+      "platform": "node"
+    }
+  ]
 }
