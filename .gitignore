@@ -15,6 +15,7 @@ system_secrets.ts
 backend/app_secrets.ts
 broker/passwd_file
 esp_replicator/esp_secrets.ts
+backend/private
 
 # Typescript generated files
 backend/lib
